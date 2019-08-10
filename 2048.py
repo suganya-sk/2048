@@ -1,17 +1,22 @@
-import pygame
-
 import numpy as np
+import pygame
 from pygame.locals import *
 
-TILE_COLOR   = (175,238,238)
+
+# constants used in the game
+TILE_COLOR   = (175, 238, 238)
 BLACK        = (0, 0, 0)
-GREEN        = (  0, 155,   0)
-BLUE         = (  0,   0, 155)
+GREEN        = (0, 155, 0)
 RED          = (255, 0, 0)
 
 
-
+# util function
 def _shift_and_merge(arr):
+    """
+    Shifts elements of the array forward, merging resulting adjacent tiles
+    with the same value.
+
+    """
     result = np.copy(arr)
     
     # shift
@@ -33,12 +38,18 @@ def _shift_and_merge(arr):
 
 
 class Game():
+    """
+    Main class for 2048 game
+    """
     pygame.init()
     FONT = pygame.font.Font(pygame.font.match_font('calibri'), 16)
     FONT.set_bold(True)
    
 
     def _make_game_window(self):
+        """
+        Creates game window
+        """
         pygame.display.set_caption('2048')
         text_surf = Game.FONT.render('Can you reach 2048?', True, GREEN, BLACK)
         text_rect = text_surf.get_rect()
@@ -49,6 +60,9 @@ class Game():
 
 
     def _add_new_numer_to_board(self):
+        """
+        Adds 2 or 4 at an empty spot on the board
+        """
         prob = np.random.random_sample()
         new_val = -1
         if prob < 0.4:
@@ -64,7 +78,12 @@ class Game():
 
 
     def _make_tile(self, text, left, top, color=BLACK, bkg_color=TILE_COLOR):
-        pygame.draw.rect(self.display_surf, TILE_COLOR, (left + 1, top + 1, 47, 47))
+        """
+        Creates a tile with given text and specified position
+        """
+        pygame.draw.rect(self.display_surf, TILE_COLOR, (left + 1, top + 1,
+                                                         47, 47)
+                        )
         tile_label = str(text) if text != -1 else ''
         text_surf = Game.FONT.render(tile_label, True, color, bkg_color)
         text_rect = text_surf.get_rect()
@@ -74,6 +93,9 @@ class Game():
 
 
     def _draw_board(self):
+        """
+        Draw game board within window
+        """
         # draw background so cells have black border
         pygame.draw.rect(self.display_surf, BLACK, (70, 70, 150, 150))
     
@@ -96,19 +118,29 @@ class Game():
 
 
     def _move_left(self):
+        """
+        Moves tiles left, merging resulting adjacent twons
+        """
         for row_index, row in enumerate(self.board):
             self.board[row_index] = _shift_and_merge(row)
 
 
     def _move_right(self):
-        # since _shift_and_merge always shifts elements to the front of the array (left), to 
-        # to shift right, flip the array, invoke _shift_and_merge and flip result again
+        """
+        Moves tiles right, merging resulting adjacent twons
+        """
+        # since _shift_and_merge always shifts elements to the front of the
+        # array (left), to shift right, flip the array, invoke _shift_and_merge
+        # and flip result again
         for row_index, row in enumerate(self.board):
             flipped_arr = row[::-1]
             result = _shift_and_merge(flipped_arr)
             self.board[row_index] = result[::-1]
 
     def _move_up(self):
+        """
+        Moves tiles up, merging resulting adjacent twons
+        """
         # use transpose to iterate through columns
         temp_board = self.board.T
         # print("Flipped board")
@@ -118,6 +150,9 @@ class Game():
         self.board = temp_board.T
 
     def _move_down(self):
+        """
+        Moves tiles down, merging resulting adjacent twons
+        """
         # use transpose to iterate through columns
         temp_board = self.board.T
         # print("Flipped board")
@@ -163,6 +198,9 @@ class Game():
 
 
     def _handle_event(self, event):
+        """
+        Handles events within game
+        """
         if event.type == KEYDOWN:
             if event.key in (K_UP, K_DOWN, K_LEFT, K_RIGHT):
                 self.move_count += 1       
@@ -183,7 +221,8 @@ class Game():
                 msg_surf = Game.FONT.render('Congrats! You reached 2048 in %s moves! :)' %self.move_count , True, GREEN, BLACK)
                 self.game_over = True
             elif self._is_board_full():
-                msg_surf = Game.FONT.render('Game over! Better luck next time!' , True, RED, BLACK)
+                msg_surf = Game.FONT.render('Game over! Better luck next time!',
+                                            True, RED, BLACK)
                 self.game_over = True
             if self.game_over:
                 msg_rect = msg_surf.get_rect()
@@ -194,6 +233,9 @@ class Game():
 
    
     def __init__(self):
+        """
+        Initializes and runs game
+        """
         self.display_surf = pygame.display.set_mode((400, 400))
         self._make_game_window()
 
