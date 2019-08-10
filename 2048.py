@@ -129,13 +129,37 @@ class Game():
         self.board = temp_board.T
 
 
-    # def is_board_full(self):
-    #     if -1 not in self.board:
-    #         if:
-    #             return False
-    #         else:
-    #             return True
-    #     return False
+    def _is_next_move_possible(self):
+        """
+        Checks if another move is possible on a full board; such a move is
+        possible when two adjacent elements are the same.
+        """
+        # checking rows
+        for row in self.board:
+            for index, val in enumerate(row[:-1]):
+                if val == row[index + 1]:
+                    return True
+
+        # checking columns
+        for col in self.board.T:
+            for index, val in enumerate(col[:-1]):
+                if val == col[index + 1]:
+                    return True
+
+        return False
+
+
+    def _is_board_full(self):
+        """
+        Checks if the board is full
+
+        """
+        if -1 not in self.board:
+            if self._is_next_move_possible():
+                return False
+            else:
+                return True
+        return False
 
 
     def _handle_event(self, event):
@@ -158,7 +182,7 @@ class Game():
             if 2048 in self.board:
                 msg_surf = Game.FONT.render('Congrats! You reached 2048 in %s moves! :)' %self.move_count , True, GREEN, BLACK)
                 self.game_over = True
-            elif -1 not in self.board:
+            elif self._is_board_full():
                 msg_surf = Game.FONT.render('Game over! Better luck next time!' , True, RED, BLACK)
                 self.game_over = True
             if self.game_over:
