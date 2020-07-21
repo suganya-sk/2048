@@ -2,7 +2,7 @@
 
 import numpy as np
 import pygame
-from pygame.locals import *
+from pygame.locals import QUIT, K_DOWN, K_UP, K_RIGHT, K_LEFT, KEYDOWN
 
 
 # constants used in the game
